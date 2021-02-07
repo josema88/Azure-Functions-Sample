@@ -19,7 +19,7 @@ namespace Company.Function
     {
         private static Serializator serializator = new Serializator();
         
-        [FunctionName("InsertDepartaments")]
+        [FunctionName("InsertDepartments")]
         public static async Task<IActionResult> Insert(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "departamentos")] HttpRequest req,
             ILogger log, ExecutionContext context)
@@ -70,7 +70,7 @@ namespace Company.Function
                     : (ActionResult)new OkObjectResult($"Data {name} stored succesfully");
         }
 
-        [FunctionName("GetDepartaments")]
+        [FunctionName("GetDepartments")]
         public static async Task<IActionResult> Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "departamentos/{id:int?}")] HttpRequest req,
             int? id, ILogger log, ExecutionContext context)
@@ -119,7 +119,7 @@ namespace Company.Function
                     : (ActionResult)new OkObjectResult(data);
         }
 
-        [FunctionName("UpdateDepartaments")]
+        [FunctionName("UpdateDepartments")]
         public static async Task<IActionResult> Update(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "departamentos/{id:int}")] HttpRequest req,
             int id, ILogger log, ExecutionContext context)
@@ -169,7 +169,7 @@ namespace Company.Function
                     : (ActionResult)new OkObjectResult($"Data for id {id} update succesfully");
         }
         
-        [FunctionName("DeleteDepartaments")]
+        [FunctionName("DeleteDepartments")]
         public static async Task<IActionResult> Delete(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "departamentos/{id:int}")] HttpRequest req,
             int id, ILogger log, ExecutionContext context)
