@@ -30,6 +30,20 @@ Be sure that in your local environment you have the fille local.settings.json. W
 }
 ```
 
+### Run the project
+
+You can run the project with VS Code. Open the folder with VS Code, go to options panel at the top and click in "Run" then you can select "Start debugging" or "Run without debugging".
+
+For reference check my [sesion in Code Camp 2021 at Youtube](https://youtu.be/vtAKCn82_F0).
+
+## Create Function App and Deploy your Azure function
+
+In order to run your Function in the cloud, you should create an Azure Function App instance. You can create it within Visual Studio code using the Azure Functions plugin.
+
+Once your Function App instance is created, now you can deploy it with Visual Studio Code using the Azure Functions plugin.
+
+For more information you can check the [official documentation](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs-code?tabs=csharp)
+
 ### Connect to DB in your Azure Cloud environment
 
 Go to your Azure App Function in Azure and add an environment variable at the instance's Settings -> Configuration -> Application settings.
@@ -38,9 +52,3 @@ Go to your Azure App Function in Azure and add an environment variable at the in
 - Value: < Your Connection String >
 
 After add the connection string, save changes.
-
-### Run the project
-
-You can run the project with VS Code. Open the folder with VS Code, go to options panel at the top and click in "Run" then you can select "Start debugging" or "Run without debugging".
-
-For reference check my [sesion in Code Camp 2021 at Youtube](https://youtu.be/vtAKCn82_F0).
