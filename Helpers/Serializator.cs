@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-namespace Company.Function
+namespace Company.Function.Helpers
 {
     public class Serializator
     {
