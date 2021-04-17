@@ -7,29 +7,26 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+using Company.Function.Data;
 
 namespace Company.Function
 {
-    public static class DepartamentosFunctions
+    public static class DepartamentsFunctions
     {
-        private static Serializator serializator = new Serializator();
+        private static DepartmentsRepository departmentsRepository = new DepartmentsRepository();
         
         [FunctionName("InsertDepartments")]
         public static async Task<IActionResult> Insert(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "departamentos")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "departments")] HttpRequest req,
             ILogger log, ExecutionContext context)
         {
             log.LogInformation("Insert");
 
-            string name = req.Query["name"];
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            string name = data?.name;
+            string description = data?.description;
 
             var config = new ConfigurationBuilder()
                             .SetBasePath(context.FunctionAppDirectory)
@@ -44,17 +41,7 @@ namespace Company.Function
             {
                 try
                 {
-                    using (SqlConnection connection = new SqlConnection(connectionString))
-                    {
-                        // insert
-                        string query = String.Format("INSERT INTO [dbo].[departamento] ([nombre])  VALUES ('{0}')", name);
-                        using (SqlCommand cmd = new SqlCommand(query, connection))
-                        {
-                            connection.Open();
-                            cmd.ExecuteNonQuery();
-                            connection.Close();
-                        }	
-                    }
+                    await departmentsRepository.InsertDepartment(connectionString, name, description);
                     successful = true;
                 }
                 catch (Exception x)
@@ -72,7 +59,7 @@ namespace Company.Function
 
         [FunctionName("GetDepartments")]
         public static async Task<IActionResult> Get(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "departamentos/{id:int?}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "departments/{id:int?}")] HttpRequest req,
             int? id, ILogger log, ExecutionContext context)
         {
             log.LogInformation("Get");
@@ -89,24 +76,7 @@ namespace Company.Function
             log.LogInformation($"Parameter: {id}");
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    string query = (id != null) 
-                        ? String.Format("SELECT * FROM [dbo].[departamento] WHERE id = {0}", id.ToString())
-                        : "SELECT * FROM [dbo].[departamento]";
-                    using (SqlCommand cmd = new SqlCommand())
-                    {
-                        SqlDataReader dataReader;
-                        cmd.CommandText = query;
-                        cmd.CommandType = CommandType.Text;
-                        cmd.Connection = connection;
-                        connection.Open();
-                        dataReader = cmd.ExecuteReader();
-                        data = serializator.Serialize(dataReader);
-                        if(((IEnumerable<object>)data).Count()==1)
-                            data=((IEnumerable<object>)data).First();
-                    }	
-                }
+                data = await departmentsRepository.GetDepartments(connectionString, id);
                 successful = true;
             }
             catch (Exception x)
@@ -121,7 +91,7 @@ namespace Company.Function
 
         [FunctionName("UpdateDepartments")]
         public static async Task<IActionResult> Update(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "departamentos/{id:int}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "departments/{id:int}")] HttpRequest req,
             int id, ILogger log, ExecutionContext context)
         {
             log.LogInformation("Update");
@@ -129,6 +99,7 @@ namespace Company.Function
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             string name = data?.name;
+            string description = data?.description;
 
             var config = new ConfigurationBuilder()
                             .SetBasePath(context.FunctionAppDirectory)
@@ -143,17 +114,7 @@ namespace Company.Function
             {
                 try
                 {
-                    using (SqlConnection connection = new SqlConnection(connectionString))
-                    {
-                        // Update
-                        string query = String.Format("UPDATE [dbo].[departamento] SET [nombre]='{0}' WHERE [id]={1}", name, id);
-                        using (SqlCommand cmd = new SqlCommand(query, connection))
-                        {
-                            connection.Open();
-                            cmd.ExecuteNonQuery();
-                            connection.Close();
-                        }	
-                    }
+                    await departmentsRepository.UpdateDepartment(connectionString, id, name, description);
                     successful = true;
                 }
                 catch (Exception x)
@@ -171,14 +132,13 @@ namespace Company.Function
         
         [FunctionName("DeleteDepartments")]
         public static async Task<IActionResult> Delete(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "departamentos/{id:int}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "departments/{id:int}")] HttpRequest req,
             int id, ILogger log, ExecutionContext context)
         {
             log.LogInformation("Delete");
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            string name = data?.name;
 
             var config = new ConfigurationBuilder()
                             .SetBasePath(context.FunctionAppDirectory)
@@ -188,63 +148,20 @@ namespace Company.Function
             string connectionString = config["ConnectionString"];
 
             var successful = false;
-            log.LogInformation($"Parameter: {name}");
-            if(!String.IsNullOrEmpty(name))
+            log.LogInformation($"Parameter: {id.ToString()}");
+            try
             {
-                try
-                {
-                    using (SqlConnection connection = new SqlConnection(connectionString))
-                    {
-                        // Delete
-                        string query = String.Format("DELETE FROM [dbo].[departamento] WHERE [id]={1}", id);
-                        using (SqlCommand cmd = new SqlCommand(query, connection))
-                        {
-                            connection.Open();
-                            cmd.ExecuteNonQuery();
-                            connection.Close();
-                        }	
-                    }
-                    successful = true;
-                }
-                catch (Exception x)
-                {
-                    log.LogInformation("exception: " + x.StackTrace.ToString());
-                    successful = false;
-                }	
+                await departmentsRepository.DeleteDepartment(connectionString, id);
+                successful = true;
             }
-            else
+            catch (Exception x)
+            {
+                log.LogInformation("exception: " + x.StackTrace.ToString());
                 successful = false;
+            }	
             return !successful
                     ? new BadRequestObjectResult("The request failed")
                     : (ActionResult)new OkObjectResult($"Data for id {id} deleted succesfully");
-        }
-    }
-
-    public class Serializator
-    {
-        public IEnumerable<Dictionary<string, object>> Serialize(SqlDataReader reader)
-        {
-            var results = new List<Dictionary<string, object>>();
-            var cols = new List<string>();
-            for (var i = 0; i < reader.FieldCount; i++)
-            {
-                var colName = reader.GetName(i);
-                var camelCaseName = Char.ToLowerInvariant(colName[0]) + colName.Substring(1);
-                cols.Add(camelCaseName);
-            }
-
-            while (reader.Read())
-                results.Add(SerializeRow(cols, reader));
-
-            return results;
-        }
-
-        private Dictionary<string, object> SerializeRow(IEnumerable<string> cols,SqlDataReader reader) 
-        {
-            var result = new Dictionary<string, object>();
-            foreach (var col in cols)
-                result.Add(col, reader[col]);
-            return result;
         }
     }
 }

@@ -15,6 +15,29 @@ This repo contains a sample project created with Azure Core Tools and Visual Stu
 
 This project contains a CRUD for SQL Server DB using functions for each operation. In order to run locally the project you should configure a DB with a simple table that will contains 2 columns: id (integer and auto incremental) and nombre (varchar).
 
+### Database setup
+
+At your SQL Server instance, create a new DB and create a simple table that will contains 4 columns: id, name, description and enabled. You can use the following SQL Server Script:
+
+```SQL
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Departments](
+    [id] [int] IDENTITY(1,1) NOT NULL,
+    [name] [varchar](255) NOT NULL,
+    [description] [varchar](255) NOT NULL,
+    [enabled] [bit] NOT NULL DEFAULT 1
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Departments] ADD PRIMARY KEY CLUSTERED 
+(
+    [id] ASC
+)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+```
+
 ### Connect to DB in your local environment
 
 Be sure that in your local environment you have the fille local.settings.json. Within that file you should add the connection string, like this sample:
