@@ -13,7 +13,7 @@ This repo contains a sample project created with Azure Core Tools and Visual Stu
 
 ## Functions Project
 
-This project contains a CRUD for SQL Server DB using functions for each operation. In order to run locally the project you should configure a DB with a simple table that will contains 2 columns: id (integer and auto incremental) and nombre (varchar).
+This project contains a CRUD for SQL Server DB using functions for each operation. In order to run locally the project you should configure a DB with a simple table that will contains 4 columns.
 
 ### Database setup
 
