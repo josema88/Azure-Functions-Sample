@@ -20,7 +20,7 @@ namespace Company.Function.Data
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     connection.Open();
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                     connection.Close();
                 }	
             }
@@ -59,7 +59,7 @@ namespace Company.Function.Data
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     connection.Open();
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                     connection.Close();
                 }	
             }
@@ -74,7 +74,7 @@ namespace Company.Function.Data
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     connection.Open();
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                     connection.Close();
                 }	
             }
