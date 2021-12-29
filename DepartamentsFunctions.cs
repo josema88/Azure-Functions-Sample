@@ -9,12 +9,14 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using Company.Function.Data;
+using Azure_Functions_Sample.Helpers;
 
 namespace Company.Function
 {
     public static class DepartamentsFunctions
     {
         private static DepartmentsRepository departmentsRepository = new DepartmentsRepository();
+        private static ConfigurationCustomProvider configurationProvider = new ConfigurationCustomProvider();
         
         [FunctionName("InsertDepartments")]
         public static async Task<IActionResult> Insert(
@@ -28,11 +30,7 @@ namespace Company.Function
             string name = data?.name;
             string description = data?.description;
 
-            var config = new ConfigurationBuilder()
-                            .SetBasePath(context.FunctionAppDirectory)
-                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                            .AddEnvironmentVariables()
-                            .Build();
+            var config = configurationProvider.GetConfiguration(context.FunctionAppDirectory);
             string connectionString = config["ConnectionString"];
 
             var successful = false;
@@ -64,11 +62,7 @@ namespace Company.Function
         {
             log.LogInformation("Get");
 
-            var config = new ConfigurationBuilder()
-                            .SetBasePath(context.FunctionAppDirectory)
-                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                            .AddEnvironmentVariables()
-                            .Build();
+            var config = configurationProvider.GetConfiguration(context.FunctionAppDirectory);
             string connectionString = config["ConnectionString"];
 
             var successful = false;
@@ -101,11 +95,7 @@ namespace Company.Function
             string name = data?.name;
             string description = data?.description;
 
-            var config = new ConfigurationBuilder()
-                            .SetBasePath(context.FunctionAppDirectory)
-                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                            .AddEnvironmentVariables()
-                            .Build();
+            var config = configurationProvider.GetConfiguration(context.FunctionAppDirectory);
             string connectionString = config["ConnectionString"];
 
             var successful = false;
@@ -140,11 +130,7 @@ namespace Company.Function
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-            var config = new ConfigurationBuilder()
-                            .SetBasePath(context.FunctionAppDirectory)
-                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                            .AddEnvironmentVariables()
-                            .Build();
+            var config = configurationProvider.GetConfiguration(context.FunctionAppDirectory);
             string connectionString = config["ConnectionString"];
 
             var successful = false;
